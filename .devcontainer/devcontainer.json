@@ -1,0 +1,16 @@
+{
+    "name": "React Native Android Container",
+      "context": "..",
+      "dockerFile": "../Dockerfile",
+      "runArgs": [
+      "--privileged",
+      "--net",
+      "host",
+      "-v",
+      "/dev/bus/usb:/dev/bus/usb"
+    ],
+    "settings": {
+      "terminal.integrated.shell.linux": null
+    },
+    "extensions": ["msjsdiag.vscode-react-native"]
+  }
