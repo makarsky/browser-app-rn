@@ -7,8 +7,7 @@
  */
 
 import * as React from 'react';
-import { Appbar, BottomNavigation, Text } from 'react-native-paper';
-
+import {Appbar, BottomNavigation, Text} from 'react-native-paper';
 
 const MusicRoute = () => <Text>Music</Text>;
 
@@ -17,7 +16,6 @@ const AlbumsRoute = () => <Text>Albums</Text>;
 const RecentsRoute = () => <Text>Recents</Text>;
 
 const App = () => {
-
   const _goBack = () => console.log('Went back');
 
   const _handleSearch = () => console.log('Searching');
@@ -26,10 +24,10 @@ const App = () => {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'goBack', title: 'Music', icon: 'album' },
-    { key: 'goForward', title: 'Albums', icon: 'album' },
-    { key: 'bookmark', title: 'Recents', icon: 'bookmark' },
-    { key: 'bookmarks', title: '', icon: 'history' },
+    {key: 'goBack', title: 'Music', icon: 'album'},
+    {key: 'goForward', title: 'Albums', icon: 'album'},
+    {key: 'bookmark', title: 'Recents', icon: 'bookmark'},
+    {key: 'bookmarks', title: '', icon: 'history'},
   ]);
 
   const renderScene = BottomNavigation.SceneMap({
@@ -48,7 +46,7 @@ const App = () => {
         <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
       </Appbar.Header>
       <BottomNavigation
-        navigationState={{ index, routes }}
+        navigationState={{index, routes}}
         onIndexChange={setIndex}
         renderScene={renderScene}
       />
