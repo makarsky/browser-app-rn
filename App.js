@@ -9,9 +9,11 @@
 import * as React from 'react';
 import {Appbar, BottomNavigation, Text, Colors} from 'react-native-paper';
 import { StyleSheet, View, TextInput } from 'react-native';
+import WebView from 'react-native-webview';
 
 const App = () => {
-  const [currentUrl, setCurrentUrl] = React.useState('https://google.com/aaaaaaaaaaaaaaaaaaaauhviuviuviuvuviuviuviviviyviyvyv');
+  let webview = null;
+  const [currentUrl, setCurrentUrl] = React.useState('https://google.com/');
 
   const _handleReload = () => console.log('Reload');
 
@@ -27,6 +29,10 @@ const App = () => {
 
   const _handleBookmarkList = () => console.log('List');
 
+  const handleWebViewNavigationStateChange = (newNavState) => {
+
+  };
+
   return (
     <View style={styles.view}>
       <Appbar.Header>
@@ -35,6 +41,11 @@ const App = () => {
         <Appbar.Action icon="reload" onPress={_handleReload} />
         <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
       </Appbar.Header>
+      <WebView
+        ref={(ref) => (webview = ref)}
+        source={{ uri: currentUrl }}
+        onNavigationStateChange={handleWebViewNavigationStateChange}
+      />
       <Appbar style={styles.bottomAppbar}>
         <Appbar.Action icon="chevron-left" onPress={_handleGoBack} disabled={true} />
         <Appbar.Action icon="chevron-right" onPress={_handleGoForward} />
@@ -63,7 +74,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: "space-evenly",
+    justifyContent: 'space-evenly',
     backgroundColor: Colors.grey100
   },
   view: {
