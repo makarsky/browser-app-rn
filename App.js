@@ -8,28 +8,31 @@
 
 import * as React from 'react';
 import {Appbar, Colors} from 'react-native-paper';
-import { Dimensions, StyleSheet, View, TextInput } from 'react-native';
+import {Dimensions, StyleSheet, View, TextInput, StatusBar} from 'react-native';
 import WebView from 'react-native-webview';
+import Bookmark from './src/models/Bookmark';
 
-const screen = Dimensions.get("screen");
+const screen = Dimensions.get('screen');
 const defaultUrl = 'https://www.google.com/';
+const defaultUrlTitle = 'Google';
 
 const App = () => {
   const [currentUrl, setCurrentUrl] = React.useState(defaultUrl);
   const [cachedUrl, setCachedUrl] = React.useState(defaultUrl);
+  const [urlTitle, setUrlTitle] = React.useState(defaultUrlTitle);
   const [isCurrentUrlDirty, setIsCurrentUrlDirty] = React.useState(false);
-  const [webviewProgressBarValue, setWebviewProgressBarValue] = React.useState(0);
+  const [webviewProgressBarValue, setWebviewProgressBarValue] = React.useState(
+    0,
+  );
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
+  const [bookmarks, setBookmarks] = React.useState([]);
   let webview = null;
   let urlInput = null;
-  const bookmarks = [];
 
   const _handleReload = () => webview.reload();
 
-  const _handleLoadUrl = () => {
-    setCachedUrl(currentUrl);
-  };
+  const _handleLoadUrl = () => setCachedUrl(currentUrl);
 
   const _handleMore = () => console.log('Shown more');
 
@@ -37,25 +40,37 @@ const App = () => {
 
   const _handleGoForward = () => webview.goForward();
 
-  const _handleBoormark = () => console.log('Make a bookmark');
+  const _isCachedUrlInBookmarks = () => {
+    return bookmarks.some((bookmark) => bookmark.url === cachedUrl);
+  };
+
+  const _addBookmark = () => {
+    if (!_isCachedUrlInBookmarks()) {
+      setBookmarks([new Bookmark(urlTitle, cachedUrl), ...bookmarks]);
+    }
+  };
+
+  const _removeBookmark = () => {
+    if (_isCachedUrlInBookmarks()) {
+      setBookmarks(bookmarks.filter((bookmark) => bookmark.url !== cachedUrl));
+    }
+  };
 
   const _handleBookmarkList = () => console.log('List');
 
-  const _handleWebViewNavigationStateChange = (newNavState) => {
-
-  };
+  const _handleWebViewNavigationStateChange = (newNavState) => {};
 
   const _onLoadStart = (event) => {
     setCurrentUrl(event.nativeEvent.url);
     setIsCurrentUrlDirty(currentUrl !== cachedUrl);
-    // console.log(event.nativeEvent.title);
+    setUrlTitle(event.nativeEvent.title);
 
     // TODO: Smoothly show progress bar
   };
 
   const _onLoadEnd = (event) => {
     // console.log(event.nativeEvent.loading);
-    // console.log(event.nativeEvent.title);
+    setUrlTitle(event.nativeEvent.title);
     setCanGoBack(event.nativeEvent.canGoBack);
     setCanGoForward(event.nativeEvent.canGoForward);
     setWebviewProgressBarValue(0);
@@ -80,14 +95,15 @@ const App = () => {
 
   const _renderUrlControls = () => {
     if (isCurrentUrlDirty) {
-      return (<Appbar.Action icon="arrow-right-bold" onPress={_handleLoadUrl} />);
+      return <Appbar.Action icon="arrow-right-bold" onPress={_handleLoadUrl} />;
     } else {
-      return (<Appbar.Action icon="reload" onPress={_handleReload} />);
+      return <Appbar.Action icon="reload" onPress={_handleReload} />;
     }
   };
 
   return (
     <View style={styles.view}>
+      <StatusBar backgroundColor={Colors.blue600} />
       <Appbar.Header>
         <TextInput
           ref={(ref) => (urlInput = ref)}
@@ -101,21 +117,43 @@ const App = () => {
         <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
       </Appbar.Header>
       <View style={styles.view}>
-        <WebView go
+        <WebView
+          go
           ref={(ref) => (webview = ref)}
-          source={{ uri: cachedUrl }}
+          source={{uri: cachedUrl}}
           onLoadStart={_onLoadStart}
           onLoadEnd={_onLoadEnd}
           onLoadProgress={_onLoadProgress}
           onNavigationStateChange={_handleWebViewNavigationStateChange}
         />
-        <View style={{...styles.webviewProgressBar, width: webviewProgressBarValue}}></View>
+        <View
+          style={{
+            ...styles.webviewProgressBar,
+            width: webviewProgressBarValue,
+          }}
+        />
       </View>
       <Appbar style={styles.bottomAppbar}>
-        <Appbar.Action icon="chevron-left" onPress={_handleGoBack} disabled={!canGoBack} />
-        <Appbar.Action icon="chevron-right" onPress={_handleGoForward} disabled={!canGoForward} />
-        <Appbar.Action icon="bookmark-outline" onPress={_handleBoormark} />
-        <Appbar.Action icon="format-list-bulleted" onPress={_handleBookmarkList} />
+        <Appbar.Action
+          icon="chevron-left"
+          onPress={_handleGoBack}
+          disabled={!canGoBack}
+        />
+        <Appbar.Action
+          icon="chevron-right"
+          onPress={_handleGoForward}
+          disabled={!canGoForward}
+        />
+        {!_isCachedUrlInBookmarks() && (
+          <Appbar.Action icon="bookmark-outline" onPress={_addBookmark} />
+        )}
+        {_isCachedUrlInBookmarks() && (
+          <Appbar.Action icon="bookmark" onPress={_removeBookmark} />
+        )}
+        <Appbar.Action
+          icon="format-list-bulleted"
+          onPress={_handleBookmarkList}
+        />
       </Appbar>
     </View>
   );
