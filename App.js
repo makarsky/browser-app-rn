@@ -7,8 +7,8 @@
  */
 
 import * as React from 'react';
-import {Appbar, Colors} from 'react-native-paper';
-import {Dimensions, StyleSheet, View, TextInput, StatusBar} from 'react-native';
+import {Appbar, Colors, Menu, Button, IconButton} from 'react-native-paper';
+import {Dimensions, StyleSheet, View, TextInput, StatusBar, Provider} from 'react-native';
 import WebView from 'react-native-webview';
 import Bookmark from './src/models/Bookmark';
 
@@ -30,7 +30,10 @@ const App = () => {
   let webview = null;
   let urlInput = null;
 
-  const _handleReload = () => webview.reload();
+  const _reloadPage = () => {
+    _closeMenu();
+    webview.reload()
+  };
 
   const _handleLoadUrl = () => setCachedUrl(currentUrl);
 
@@ -97,9 +100,16 @@ const App = () => {
     if (isCurrentUrlDirty) {
       return <Appbar.Action icon="arrow-right-bold" onPress={_handleLoadUrl} />;
     } else {
-      return <Appbar.Action icon="reload" onPress={_handleReload} />;
+      return <Appbar.Action icon="reload" onPress={_reloadPage} />;
     }
   };
+
+  const [isMenuVisible, setIsMenuVisible] = React.useState(false);
+
+  const _openMenu = () => setIsMenuVisible(true);
+
+  const _closeMenu = () => setIsMenuVisible(false);
+
 
   return (
     <View style={styles.view}>
@@ -114,7 +124,16 @@ const App = () => {
           onSubmitEditing={_onSubmitCurrentUrl}
         />
         {_renderUrlControls()}
-        <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
+        
+        <View>
+        <Menu
+          visible={isMenuVisible}
+          onDismiss={_closeMenu}
+          anchor={<Appbar.Action color={Colors.white} icon="dots-vertical" onPress={_openMenu} />}>
+          <Menu.Item onPress={_reloadPage} title="Refresh" />
+          <Menu.Item onPress={() => {}} title="Bookmarks" />
+        </Menu>
+      </View>
       </Appbar.Header>
       <View style={styles.view}>
         <WebView
